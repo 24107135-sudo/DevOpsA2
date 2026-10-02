@@ -37,7 +37,7 @@ triggered by the `v1.0.0` tag and runs the whole Docker Compose stack.
 Open Command Prompt, maximise the window, then:
 
 ```bat
-cd C:\Users\Umesh\DevOpsASS2\q1-ci-cd-pipeline
+cd <repo>\q1-ci-cd-pipeline
 capture-q1.cmd local
 ```
 
@@ -112,7 +112,7 @@ Then scroll down and screenshot the **Build Docker Image** job also green.
 In the terminal:
 
 ```bat
-cd C:\Users\Umesh\DevOpsASS2
+cd <repo>
 git checkout -b feature/q1-metrics-endpoint
 ```
 
@@ -200,7 +200,7 @@ Open the two PNGs and screenshot them.
 **Option B - live in your browser (nicer, needs Docker Desktop):**
 
 ```bat
-cd C:\Users\Umesh\DevOpsASS2\q1-ci-cd-pipeline
+cd <repo>\q1-ci-cd-pipeline
 capture-q1.cmd docker
 ```
 

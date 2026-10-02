@@ -1,4 +1,4 @@
-# DevOpsASS2 - Assignment 2
+# DevOpsA2 - Assignment 2
 
 All three questions in one repository.
 
@@ -66,7 +66,7 @@ cd q2-mlflow-mlops
 ## Pushing To GitHub
 
 ```bash
-cd C:\Users\Umesh\DevOpsASS2
+cd <path-where-you-cloned-the-repo>
 git init
 git add .
 git commit -m "DevOps assignment 2: CI/CD pipeline, MLflow MLOps, end-to-end DevOps"

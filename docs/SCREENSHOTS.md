@@ -71,7 +71,7 @@ them in an `evidence/screenshots/` folder.
 Two things are installed/needed locally:
 
 - **Python 3.12** - already installed, and a virtual environment exists at
-  `DevOpsASS2/.venv` with MLflow, scikit-learn, Flask and prometheus-client.
+  `DevOpsA2/.venv` with MLflow, scikit-learn, Flask and prometheus-client.
 - **Docker Desktop** - not installed yet. Install it before running the Docker
   steps. Everything Docker-related also runs in GitHub Actions, so if Docker is
   a problem you can take those screenshots from the Actions logs instead.
