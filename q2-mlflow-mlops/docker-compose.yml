@@ -1,0 +1,114 @@
+version: "3.9"
+
+services:
+  mlflow:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mlops-mlflow:1.0.0
+    container_name: mlflow-server
+    ports:
+      - "5000:5000"
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --default-artifact-root /mlflow/artifacts
+    volumes:
+      - mlflow-data:/mlflow
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request;urllib.request.urlopen('http://localhost:5000/health')"
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      - mlops-net
+
+  trainer:
+    image: mlops-mlflow:1.0.0
+    container_name: mlflow-trainer
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_DISABLE_AGENT_HINT: "1"
+      MODEL_ARTIFACT_DIR: /artifacts
+    volumes:
+      - mlflow-data:/mlflow
+      - model-artifacts:/artifacts
+    command: python train.py --tracking-uri http://mlflow:5000
+    restart: "no"
+    networks:
+      - mlops-net
+
+  model-server:
+    image: mlops-mlflow:1.0.0
+    container_name: model-api
+    depends_on:
+      mlflow:
+        condition: service_healthy
+      trainer:
+        condition: service_completed_successfully
+    ports:
+      - "8000:8000"
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_DISABLE_AGENT_HINT: "1"
+      MODEL_NAME: cancer-detector
+      MODEL_ALIAS: champion
+      USE_SCALER: "true"
+      SCALER_PATH: /artifacts/scaler.pkl
+      MODEL_META_PATH: /artifacts/model_meta.json
+    volumes:
+      - mlflow-data:/mlflow
+      - model-artifacts:/artifacts
+    restart: unless-stopped
+    networks:
+      - mlops-net
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    container_name: mlops-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=7d
+    networks:
+      - mlops-net
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    container_name: mlops-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - mlops-net
+
+volumes:
+  mlflow-data:
+  model-artifacts:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  mlops-net:
+    driver: bridge

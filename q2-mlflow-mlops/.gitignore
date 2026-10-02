@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+mlruns/
+mlflow.db
+mlartifacts/
+mlflow-artifacts/
+*.log
+scaler.pkl
+model_meta.json
+experiment_comparison.csv
+train-local-out.txt
+evidence/
